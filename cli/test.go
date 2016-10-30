@@ -7,11 +7,11 @@ import (
 	"net/http/httputil"
 	"os"
 
-	solver "github.com/cardigann/cf-challenge-solver"
+	scraper "github.com/cardigann/go-cloudflare-scrape"
 )
 
 func main() {
-	c := http.Client{Transport: solver.NewTransport(http.DefaultTransport)}
+	c := http.Client{Transport: scraper.NewTransport(http.DefaultTransport)}
 
 	resp, err := c.Get(os.Args[1])
 	if err != nil {

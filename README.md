@@ -12,13 +12,13 @@ Usage
 package main
 
 import (
-    "github.com/cardigann/cf-challenge-solver"
+    "github.com/cardigann/go-cloudflare-scraper"
 )
 
 
 func main() {
 	c := http.Client{
-		Transport: solver.NewTransport(http.DefaultTransport),
+		Transport: scraper.NewTransport(http.DefaultTransport),
 	}
 
 	res, err := c.Get(ts.URL)

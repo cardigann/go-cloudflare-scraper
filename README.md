@@ -1,9 +1,7 @@
 Cloudflare Challenge Solver
 ===========================
 
-A port of (cloudflare-scrape)[https://github.com/Anorov/cloudflare-scrape].
-
-***Not working yet***
+A port of [cloudflare-scrape](https://github.com/Anorov/cloudflare-scrape).
 
 Usage
 -----

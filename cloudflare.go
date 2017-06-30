@@ -75,10 +75,14 @@ func (t Transport) solveChallenge(resp *http.Response) (*http.Response, error) {
 		return nil, err
 	}
 
+	log.Printf("Extracted JS: %s", js)
+
 	answer, err := t.evaluateJS(js)
 	if err != nil {
 		return nil, err
 	}
+
+	log.Printf("Evaluating JS: %#v", answer)
 
 	params.Set("jschl_answer", strconv.Itoa(int(answer)+len(resp.Request.URL.Host)))
 

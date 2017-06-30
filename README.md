@@ -15,9 +15,12 @@ import (
 
 
 func main() {
-	c := http.Client{
-		Transport: scraper.NewTransport(http.DefaultTransport),
+	scraper, err := scraper.NewTransport(http.DefaultTransport)
+	if err != nil {
+		log.Fatal(err)
 	}
+
+	c := http.Client{Transport: scraper}
 
 	res, err := c.Get(ts.URL)
 	if err != nil {

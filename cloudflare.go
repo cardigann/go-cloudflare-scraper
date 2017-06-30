@@ -20,10 +20,15 @@ const userAgent = `Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like 
 
 type Transport struct {
 	upstream http.RoundTripper
+	cookies  http.CookieJar
 }
 
-func NewTransport(upstream http.RoundTripper) *Transport {
-	return &Transport{upstream}
+func NewTransport(upstream http.RoundTripper) (*Transport, error) {
+	jar, err := cookiejar.New(nil)
+	if err != nil {
+		return nil, err
+	}
+	return &Transport{upstream, jar}, nil
 }
 
 func (t Transport) RoundTrip(r *http.Request) (*http.Response, error) {
@@ -38,7 +43,10 @@ func (t Transport) RoundTrip(r *http.Request) (*http.Response, error) {
 
 	// Check if Cloudflare anti-bot is on
 	if resp.StatusCode == 503 && resp.Header.Get("Server") == "cloudflare-nginx" {
-		return t.solveChallenge(resp)
+		log.Printf("Solving challenge for %s", resp.Request.URL.Hostname())
+		resp, err := t.solveChallenge(resp)
+
+		return resp, err
 	}
 
 	return resp, err
@@ -75,28 +83,12 @@ func (t Transport) solveChallenge(resp *http.Response) (*http.Response, error) {
 		return nil, err
 	}
 
-	log.Printf("Extracted JS: %s", js)
-
 	answer, err := t.evaluateJS(js)
 	if err != nil {
 		return nil, err
 	}
 
-	log.Printf("Evaluating JS: %#v", answer)
-
 	params.Set("jschl_answer", strconv.Itoa(int(answer)+len(resp.Request.URL.Host)))
-
-	jar, err := cookiejar.New(nil)
-	if err != nil {
-		return nil, err
-	}
-
-	client := http.Client{
-		Transport: t.upstream,
-		Jar:       jar,
-	}
-
-	log.Printf("Requesting %s?%s", u.String(), params.Encode())
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s?%s", u.String(), params.Encode()), nil)
 	if err != nil {
@@ -106,7 +98,18 @@ func (t Transport) solveChallenge(resp *http.Response) (*http.Response, error) {
 	req.Header.Set("User-Agent", resp.Request.Header.Get("User-Agent"))
 	req.Header.Set("Referer", resp.Request.URL.String())
 
-	return client.Do(req)
+	log.Printf("Requesting %s?%s", u.String(), params.Encode())
+	client := http.Client{
+		Transport: t.upstream,
+		Jar:       t.cookies,
+	}
+
+	resp, err = client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	return resp, nil
 }
 
 func (t Transport) evaluateJS(js string) (int64, error) {

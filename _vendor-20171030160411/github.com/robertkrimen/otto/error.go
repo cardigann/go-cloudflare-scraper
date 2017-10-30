@@ -56,7 +56,6 @@ type _frame struct {
 	file       *file.File
 	offset     int
 	callee     string
-	fn         interface{}
 }
 
 var (

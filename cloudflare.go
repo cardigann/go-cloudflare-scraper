@@ -1,3 +1,6 @@
+// Package scraper simply implements a http.Transport interface which, when used to perform
+// requests, will attempt to solve the challenge in the response by executing the JavaScript using
+// github.com/robertkrimen/otto as a runtime.
 package scraper
 
 import (

@@ -24,7 +24,7 @@ func makeRequest(c *http.Client, url string) {
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	log.Printf("Fetched %s in %s, %d bytes (status %d)",
-		url, time.Now().Sub(t), len(body), resp.StatusCode)
+		url, time.Since(t), len(body), resp.StatusCode)
 
 	if resp.StatusCode != http.StatusOK {
 		log.Fatal("Invalid response code")

@@ -42,7 +42,7 @@ func (t Transport) RoundTrip(r *http.Request) (*http.Response, error) {
 	}
 
 	// Check if Cloudflare anti-bot is on
-	if resp.StatusCode == 503 && resp.Header.Get("Server") == "cloudflare-nginx" {
+	if resp.StatusCode == 503 && resp.Header.Get("Server") == "cloudflare" {
 		log.Printf("Solving challenge for %s", resp.Request.URL.Hostname())
 		resp, err := t.solveChallenge(resp)
 

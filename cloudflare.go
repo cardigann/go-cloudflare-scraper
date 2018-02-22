@@ -23,6 +23,21 @@ type Transport struct {
 	cookies  http.CookieJar
 }
 
+func NewClient() (c *http.Client, err error) {
+
+	scraper_transport, err := NewTransport(http.DefaultTransport)
+	if err != nil {
+		return
+	}
+
+	c = &http.Client{
+		Transport: scraper_transport,
+		Jar:       scraper_transport.cookies,
+	}
+
+	return
+}
+
 func NewTransport(upstream http.RoundTripper) (*Transport, error) {
 	jar, err := cookiejar.New(nil)
 	if err != nil {
@@ -34,6 +49,10 @@ func NewTransport(upstream http.RoundTripper) (*Transport, error) {
 func (t Transport) RoundTrip(r *http.Request) (*http.Response, error) {
 	if r.Header.Get("User-Agent") == "" {
 		r.Header.Set("User-Agent", userAgent)
+	}
+
+	if r.Header.Get("Referer") == "" {
+		r.Header.Set("Referer", r.URL.String())
 	}
 
 	resp, err := t.upstream.RoundTrip(r)

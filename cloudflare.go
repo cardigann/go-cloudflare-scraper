@@ -20,7 +20,7 @@ const userAgent = `Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like 
 
 type Transport struct {
 	upstream http.RoundTripper
-	cookies  http.CookieJar
+	Cookies  http.CookieJar
 }
 
 func NewTransport(upstream http.RoundTripper) (*Transport, error) {
@@ -101,7 +101,7 @@ func (t Transport) solveChallenge(resp *http.Response) (*http.Response, error) {
 	log.Printf("Requesting %s?%s", u.String(), params.Encode())
 	client := http.Client{
 		Transport: t.upstream,
-		Jar:       t.cookies,
+		Jar:       t.Cookies,
 	}
 
 	resp, err = client.Do(req)

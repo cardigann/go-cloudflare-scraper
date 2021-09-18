@@ -32,7 +32,7 @@ func NewClient() (c *http.Client, err error) {
 
 	c = &http.Client{
 		Transport: scraper_transport,
-		Jar:       scraper_transport.cookies,
+		Jar:       scraper_transport.Cookies,
 	}
 
 	return
